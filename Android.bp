@@ -1,0 +1,40 @@
+libmpimmz_src = [
+    "src/rk_mpi_mmz.cpp",
+    "src/rk_ion.cpp",
+    "src/rk_dmabuf.cpp",
+]
+
+genrule {
+    name: "gen_mmz_version",
+    srcs: libmpimmz_src + [
+        "version.h.template",
+        ".git/"
+    ],
+    out: ["version.h"],
+    cmd: "rm -f $(location version.h) && " + "bash $(location version.sh) < $(in) > $(out)",
+    tool_files: ["version.sh"],
+}
+
+cc_library {
+    name: "libmpimmz",
+    srcs: libmpimmz_src,
+    local_include_dirs: [
+        "include",
+    ],
+    generated_headers: [
+        "gen_mmz_version",
+    ],
+    shared_libs: ["liblog"],
+    cflags: ["-Werror"],
+    min_sdk_version: "22",
+}
+
+cc_binary {
+    name: "mpimmz_test",
+    srcs: ["src/rk_mpi_mmz_test.c"],
+    local_include_dirs: [
+        "include",
+    ],
+    shared_libs: ["libmpimmz", "liblog"],
+    cflags: ["-Werror"],
+}
