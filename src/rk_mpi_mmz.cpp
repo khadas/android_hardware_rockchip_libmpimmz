@@ -227,6 +227,12 @@ static RK_S32 RK_MPI_MMZ_FlushCache(MB_BLK mb, RK_U32 offset, RK_U32 length, RK_
     if (mb == NULL)
         return -1;
 
+    // return directly for "end + read" and "start + write"
+    if ((!is_start && flags == RK_MMZ_SYNC_READONLY) ||
+        (!!is_start && flags == RK_MMZ_SYNC_WRITEONLY)) {
+        return 0;
+    }
+
     struct BufferInfo *pBI = (struct BufferInfo *) mb;
     int ret = 0;
     uint64_t dma_flags = (!!is_start)?DMA_BUF_SYNC_START:DMA_BUF_SYNC_END;
