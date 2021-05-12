@@ -18,6 +18,7 @@ genrule {
 cc_library {
     name: "libmpimmz",
     srcs: libmpimmz_src,
+    vendor_available: true,
     local_include_dirs: [
         "include",
     ],
