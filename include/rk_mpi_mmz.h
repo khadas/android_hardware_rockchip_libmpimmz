@@ -104,6 +104,15 @@ MB_BLK   RK_MPI_MMZ_VirAddr2Handle(RK_VOID *pstVirAddr);
 MB_BLK   RK_MPI_MMZ_PhyAddr2Handle(RK_U64 paddr);
 
 /*
+    导入fd，生成新的MB_BLK
+      fd是由其它进程通过binder传递过来
+      MB_BLK使用完之后，需要调用RK_MPI_MMZ_Free释放内存
+    成功 返回mb
+    失败 返回NULL
+ */
+MB_BLK   RK_MPI_MMZ_ImportFD(RK_S32 fd, RK_U32 len);
+
+/*
     查询buffer是否cacheable
     是  返回1
     否  返回0

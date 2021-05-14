@@ -27,10 +27,10 @@ static MB_LIST mb_list;
 // you can query version by 'strings' command
 const char* mpi_mmz_version = MPI_MMZ_BUILT_VERSION;
 
-static MB_BLK create_blk_from_fd(int fd, int len, uint32_t flags)
+static MB_BLK create_blk_from_fd(int fd, RK_U32 len, uint32_t flags)
 {
     // get buffer length
-    if (len <= 0) {
+    if (len == 0) {
         len = dmabuf_get_size(fd);
         if (len < 0) {
             ALOGE("get buffer length failed: %s", strerror(errno));
@@ -173,7 +173,7 @@ MB_BLK RK_MPI_MMZ_Fd2Handle(RK_S32 fd)
     if (fd < 0)
         return (MB_BLK)NULL;
 
-    // 先查表
+    // 查表
     for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); iter++)
     {
         struct BufferInfo *pBI = (struct BufferInfo *)*iter;
@@ -181,13 +181,7 @@ MB_BLK RK_MPI_MMZ_Fd2Handle(RK_S32 fd)
             return (MB_BLK)pBI;
     }
 
-    // 不在表中，则创建新的MB_BLK
-    MB_BLK mb = create_blk_from_fd(fd, 0, (uint32_t)-1);
-
-    if (mb != (MB_BLK)NULL)
-        mb_list.push_back(mb);
-
-    return mb;
+    return (MB_BLK)NULL;
 }
 
 MB_BLK RK_MPI_MMZ_VirAddr2Handle(RK_VOID *pstVirAddr)
@@ -220,6 +214,24 @@ MB_BLK RK_MPI_MMZ_PhyAddr2Handle(RK_U64 paddr)
     }
 
     return (MB_BLK)NULL;
+}
+
+MB_BLK RK_MPI_MMZ_ImportFD(RK_S32 fd, RK_U32 len)
+{
+    if (fd < 0)
+        return (MB_BLK)NULL;
+
+    // 若已在表中，则返回失败
+    if (RK_MPI_MMZ_Fd2Handle(fd) != (MB_BLK)NULL)
+        return (MB_BLK)NULL;
+
+    // 不在表中，则创建新的MB_BLK
+    MB_BLK mb = create_blk_from_fd(fd, len, (uint32_t)-1);
+
+    if (mb != (MB_BLK)NULL)
+        mb_list.push_back(mb);
+
+    return mb;
 }
 
 static RK_S32 RK_MPI_MMZ_FlushCache(MB_BLK mb, RK_U32 offset, RK_U32 length, RK_U32 flags, int is_start)
