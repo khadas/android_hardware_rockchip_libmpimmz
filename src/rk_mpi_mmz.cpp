@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include <list>
+#include <mutex>
 
 #include "rk_mpi_mmz.h"
 #include "log.h"
@@ -23,6 +24,7 @@ struct BufferInfo {
 
 typedef std::list<MB_BLK> MB_LIST;
 static MB_LIST mb_list;
+static std::mutex mb_list_mutex;
 
 // you can query version by 'strings' command
 const char* mpi_mmz_version = MPI_MMZ_BUILT_VERSION;
@@ -89,7 +91,11 @@ RK_S32 RK_MPI_MMZ_Alloc(MB_BLK *pBlk, RK_U32 u32Len, RK_U32 u32Flags)
         return -1;
     }
 
+    {
+    std::lock_guard<std::mutex> lck (mb_list_mutex);
     mb_list.push_back(mb);
+    }
+
     *pBlk = mb;
 
     return 0;
@@ -114,7 +120,10 @@ RK_S32 RK_MPI_MMZ_Free(MB_BLK mb)
     }
     free(pBI);
 
+    {
+    std::lock_guard<std::mutex> lck (mb_list_mutex);
     mb_list.remove(mb);
+    }
 
     return 0;
 }
@@ -174,6 +183,7 @@ MB_BLK RK_MPI_MMZ_Fd2Handle(RK_S32 fd)
         return (MB_BLK)NULL;
 
     // 查表
+    std::lock_guard<std::mutex> lck (mb_list_mutex);
     for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); iter++)
     {
         struct BufferInfo *pBI = (struct BufferInfo *)*iter;
@@ -189,6 +199,7 @@ MB_BLK RK_MPI_MMZ_VirAddr2Handle(RK_VOID *pstVirAddr)
     if (pstVirAddr == NULL)
         return (MB_BLK)NULL;
 
+    std::lock_guard<std::mutex> lck (mb_list_mutex);
     for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); iter++)
     {
         struct BufferInfo *pBI = (struct BufferInfo *)*iter;
@@ -205,6 +216,7 @@ MB_BLK RK_MPI_MMZ_PhyAddr2Handle(RK_U64 paddr)
     if (paddr == (uint64_t)-1)
         return (MB_BLK)NULL;
 
+    std::lock_guard<std::mutex> lck (mb_list_mutex);
     for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); iter++)
     {
         struct BufferInfo *pBI = (struct BufferInfo *)*iter;
@@ -229,7 +241,10 @@ MB_BLK RK_MPI_MMZ_ImportFD(RK_S32 fd, RK_U32 len)
     MB_BLK mb = create_blk_from_fd(fd, len, (uint32_t)-1);
 
     if (mb != (MB_BLK)NULL)
+    {
+        std::lock_guard<std::mutex> lck (mb_list_mutex);
         mb_list.push_back(mb);
+    }
 
     return mb;
 }

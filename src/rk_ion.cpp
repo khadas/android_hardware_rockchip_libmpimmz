@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <vector>
+#include <mutex>
 
 #include "log.h"
 #include "linux4.19/ion.h"
@@ -16,6 +17,7 @@
 
 static int ion_fd = -1;
 static std::vector<struct ion_heap_data> ion_heaps;
+static std::mutex ion_heaps_mutex;
 
 static int ion_open()
 {
@@ -47,7 +49,6 @@ static int ion_ioctl(int req, void* arg) {
         ALOGE("ioctl %x failed with code %d: %s", req, ret, strerror(errno));
     }
 
-    ion_close();
     return ret;
 }
 
@@ -74,11 +75,14 @@ static int ion_query_heaps()
 
 static uint32_t ion_get_heap_id_mask(uint32_t heap_type)
 {
+    {
+    std::lock_guard<std::mutex> lck (ion_heaps_mutex);
     if (ion_heaps.empty()) {
         ion_query_heaps();
         if (ion_heaps.empty()) {
             return (uint32_t)-1;
         }
+    }
     }
 
     for (const auto& heap : ion_heaps) {
