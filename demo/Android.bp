@@ -2,7 +2,7 @@ cc_binary {
     name: "mpimmz_rga_demo",
     srcs: ["mpimmz_rga_demo.cpp"],
     include_dirs: [
-        "hardware/rockchip/mpi-mmz/include",
+        "hardware/rockchip/libmpimmz/include",
         "hardware/rockchip/librga",
         "hardware/libhardware/include",
         "frameworks/native/libs/nativewindow/include",
@@ -23,7 +23,7 @@ cc_binary {
     name: "mpimmz_binder_demo",
     srcs: ["mpimmz_binder_demo.cpp"],
     include_dirs: [
-        "hardware/rockchip/mpi-mmz/include",
+        "hardware/rockchip/libmpimmz/include",
         "system/core/include",
         "frameworks/native/include",
     ],
