@@ -19,6 +19,8 @@ struct BufferInfo {
     uint32_t    flags;
     void*       vaddr;
     uint64_t    paddr;
+    uint32_t    hor_stride;
+    uint32_t    ver_stride;
     void*       priv;
 };
 
@@ -381,6 +383,36 @@ RK_S32 RK_MPI_SYS_CreateMB(MB_BLK *pBlk, MB_EXT_CONFIG_S *pstMbExtConfig)
     }
 
     *pBlk = (MB_BLK)pBI;
+
+    return 0;
+}
+
+RK_S32 RK_MPI_MB_SetBufferStride(MB_BLK mb, RK_U32 u32HorStride, RK_U32 u32VerStride)
+{
+    if (mb == NULL) {
+        return -1;
+    }
+
+    struct BufferInfo *pBI = (struct BufferInfo *) mb;
+    pBI->hor_stride = u32HorStride;
+    pBI->ver_stride = u32VerStride;
+
+    return 0;
+}
+
+RK_S32 RK_MPI_MB_GetBufferStride(MB_BLK mb, RK_U32 *pu32HorStride, RK_U32 *pu32VerStride)
+{
+    if (mb == NULL) {
+        return -1;
+    }
+
+    struct BufferInfo *pBI = (struct BufferInfo *) mb;
+
+    if (pu32HorStride)
+        *pu32HorStride = pBI->hor_stride;
+
+    if (pu32VerStride)
+        *pu32VerStride = pBI->ver_stride;
 
     return 0;
 }

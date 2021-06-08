@@ -187,6 +187,14 @@ RK_S32 RK_MPI_MMZ_FlushCachePaddrEnd(RK_U64 vaddr, RK_U32 length, RK_U32 flags);
  */
 RK_S32 RK_MPI_SYS_CreateMB(MB_BLK *pBlk, MB_EXT_CONFIG_S *pstMbExtConfig);
 
+/*
+    设置/获取buffer的宽高信息，给TDE使用
+    成功  返回0
+    失败  返回负值
+ */
+RK_S32 RK_MPI_MB_SetBufferStride(MB_BLK mb, RK_U32 u32HorStride, RK_U32 u32VerStride);
+RK_S32 RK_MPI_MB_GetBufferStride(MB_BLK mb, RK_U32 *pu32HorStride, RK_U32 *pu32VerStride);
+
 #ifdef __cplusplus
 #if __cplusplus
 }
