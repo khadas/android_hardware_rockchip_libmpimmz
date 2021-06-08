@@ -33,9 +33,9 @@ int dmabuf_sync_partial(int fd, uint32_t offset, uint32_t len, uint64_t flags)
     return dmabuf_ioctl(fd, DMA_BUF_IOCTL_SYNC_PARTIAL, &sync_p);
 }
 
-int dmabuf_get_size(int fd)
+off_t dmabuf_get_size(int fd)
 {
-    int len = lseek(fd, 0, SEEK_END);
+    off_t len = lseek(fd, 0, SEEK_END);
 
     lseek(fd, 0, SEEK_SET);
     return len;

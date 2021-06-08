@@ -32,6 +32,15 @@ typedef uint32_t            RK_U32;
 typedef uint64_t            RK_U64;
 typedef void                RK_VOID;
 
+typedef struct _rkMB_EXT_CONFIG_S {
+    RK_VOID            *vaddr;
+    RK_U64              paddr;
+    RK_S32              fd;
+    RK_U64              len;
+    RK_VOID            *reserve1;
+    RK_VOID            *reserve2;
+} MB_EXT_CONFIG_S;
+
 #define RK_MMZ_ALLOC_TYPE_IOMMU     0x00000000
 #define RK_MMZ_ALLOC_TYPE_CMA       0x00000001
 
@@ -167,6 +176,16 @@ RK_S32 RK_MPI_MMZ_FlushCachePaddrStart(RK_U64 vaddr, RK_U32 length, RK_U32 flags
     失败  返回负值
  */
 RK_S32 RK_MPI_MMZ_FlushCachePaddrEnd(RK_U64 vaddr, RK_U32 length, RK_U32 flags);
+
+/*
+    把用户的内存加入到MMZ进行管理
+    当这块内存不再使用时候，需调用RK_MPI_MMZ_Free释放内存
+    pBlk             返回MB_BLK，其中存放着用户内存的信息
+    pstMbExtConfig   由用户提供的内存信息
+    成功  返回0
+    失败  返回负值
+ */
+RK_S32 RK_MPI_SYS_CreateMB(MB_BLK *pBlk, MB_EXT_CONFIG_S *pstMbExtConfig);
 
 #ifdef __cplusplus
 #if __cplusplus

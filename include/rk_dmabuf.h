@@ -11,7 +11,7 @@ extern "C" {
 
 int dmabuf_sync(int fd, uint64_t flags);
 int dmabuf_sync_partial(int fd, uint32_t offset, uint32_t len, uint64_t flags);
-int dmabuf_get_size(int fd);
+off_t dmabuf_get_size(int fd);
 void* dmabuf_mmap(int fd, off_t offset, size_t len);
 
 #ifdef __cplusplus

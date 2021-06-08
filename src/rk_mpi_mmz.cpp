@@ -33,11 +33,12 @@ static MB_BLK create_blk_from_fd(int fd, RK_U32 len, uint32_t flags)
 {
     // get buffer length
     if (len == 0) {
-        len = dmabuf_get_size(fd);
-        if (len < 0) {
+        off_t _size = dmabuf_get_size(fd);
+        if (_size == (off_t) -1) {
             ALOGE("get buffer length failed: %s", strerror(errno));
             return (MB_BLK)NULL;
         }
+        len = _size;
     }
 
     // get physic addr
@@ -55,6 +56,11 @@ static MB_BLK create_blk_from_fd(int fd, RK_U32 len, uint32_t flags)
 
     // setup pBlk
     struct BufferInfo *pBI = (struct BufferInfo *)malloc(sizeof(struct BufferInfo));
+    if (pBI == NULL) {
+        ALOGE("out of memory: %s", strerror(errno));
+        return (MB_BLK)NULL;
+    }
+
     memset(pBI, 0, sizeof(struct BufferInfo));
     pBI->fd = fd;
     pBI->len = len;
@@ -264,7 +270,7 @@ static RK_S32 RK_MPI_MMZ_FlushCache(MB_BLK mb, RK_U32 offset, RK_U32 length, RK_
     int ret = 0;
     uint64_t dma_flags = (!!is_start)?DMA_BUF_SYNC_START:DMA_BUF_SYNC_END;
 
-    if (offset >= pBI->len)
+    if (offset >= pBI->len || pBI->fd <= 0)
         return -1;
 
     if ((length+offset) > pBI->len)
@@ -346,4 +352,35 @@ RK_S32 RK_MPI_MMZ_FlushCachePaddrEnd(RK_U64 paddr, RK_U32 length, RK_U32 flags)
     uint32_t offset = paddr - RK_MPI_MMZ_Handle2PhysAddr(mb);
 
     return RK_MPI_MMZ_FlushCache(mb, offset, length, flags, 0);
+}
+
+RK_S32 RK_MPI_SYS_CreateMB(MB_BLK *pBlk, MB_EXT_CONFIG_S *pstMbExtConfig)
+{
+    if (pstMbExtConfig==NULL || pstMbExtConfig->len==0 ||
+        (pstMbExtConfig->paddr==0 && pstMbExtConfig->vaddr==NULL && pstMbExtConfig->fd<=0)) {
+        return -1;
+    }
+
+    // setup pBlk
+    struct BufferInfo *pBI = (struct BufferInfo *)malloc(sizeof(struct BufferInfo));
+    if (pBI == NULL) {
+        ALOGE("out of memory: %s", strerror(errno));
+        return -2;
+    }
+
+    memset(pBI, 0, sizeof(struct BufferInfo));
+    pBI->fd = pstMbExtConfig->fd;
+    pBI->len = pstMbExtConfig->len;
+    pBI->paddr = pstMbExtConfig->paddr;
+    pBI->vaddr = pstMbExtConfig->vaddr;
+    pBI->flags = (uint32_t)-1;
+
+    {
+    std::lock_guard<std::mutex> lck (mb_list_mutex);
+    mb_list.push_back(pBI);
+    }
+
+    *pBlk = (MB_BLK)pBI;
+
+    return 0;
 }
