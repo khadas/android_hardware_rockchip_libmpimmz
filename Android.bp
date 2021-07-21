@@ -7,12 +7,12 @@ libmpimmz_src = [
 genrule {
     name: "gen_mmz_version",
     srcs: libmpimmz_src + [
+        "version.sh",
         "version.h.template",
         ".git/"
     ],
     out: ["version.h"],
-    cmd: "rm -f $(location version.h) && " + "bash $(location version.sh) < $(in) > $(out)",
-    tool_files: ["version.sh"],
+    cmd: "bash $(location version.sh) < $(in) > $(out)",
 }
 
 cc_library {
