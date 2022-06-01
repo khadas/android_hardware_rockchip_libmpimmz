@@ -131,51 +131,63 @@ RK_S32 RK_MPI_MMZ_IsCacheable(MB_BLK mb);
 
 /*
     flush cache, 在cpu访问前调用
-    当offset和length都等于0时候，执行full sync，否则执行partial sync
+      当offset等于0，且length等于0或者length是整块buffer大小的时候，执行full sync
+      其它情况则执行partial sync
+      partial sync要求offset和length是64bytes对齐
     成功  返回0
     失败  返回负值
  */
 RK_S32 RK_MPI_MMZ_FlushCacheStart(MB_BLK mb, RK_U32 offset, RK_U32 length, RK_U32 flags);
 
 /*
-    flush cache, 在cpu访问结束后调用
-    当offset和length都等于0时候，执行full sync，否则执行partial sync
+    flush cache, 在cpu访问前调用
+      当offset等于0，且length等于0或者length是整块buffer大小的时候，执行full sync
+      其它情况则执行partial sync
+      partial sync要求offset和length是64bytes对齐
     成功  返回0
     失败  返回负值
  */
 RK_S32 RK_MPI_MMZ_FlushCacheEnd(MB_BLK mb, RK_U32 offset, RK_U32 length, RK_U32 flags);
 
 /*
-    flush cache, 在cpu访问前调用
-      指定待刷新内存的虚拟地址及其长度，只支持partial sync
+    flush cache, 在cpu访问前调用，指定待刷新内存的虚拟地址及其长度
+      当vaddr是buffer的起始地址，且length是整块buffer的大小，执行full sync
+      其它情况则执行partial sync
+      partial sync要求offset和length是64bytes对齐
     成功  返回0
     失败  返回负值
  */
 RK_S32 RK_MPI_MMZ_FlushCacheVaddrStart(RK_VOID* vaddr, RK_U32 length, RK_U32 flags);
 
 /*
-    flush cache, 在cpu访问结束后调用
-      指定待刷新内存的虚拟地址及其长度，只支持partial sync
+    flush cache, 在cpu访问结束后调用，指定待刷新内存的虚拟地址及其长度
+      当vaddr是buffer的起始地址，且length是整块buffer的大小，执行full sync
+      其它情况则执行partial sync
+      partial sync要求地址偏移和length是64bytes对齐
     成功  返回0
     失败  返回负值
  */
 RK_S32 RK_MPI_MMZ_FlushCacheVaddrEnd(RK_VOID* vaddr, RK_U32 length, RK_U32 flags);
 
 /*
-    flush cache, 在cpu访问前调用
-      指定待刷新内存的物理地址及其长度，只支持partial sync
+    flush cache, 在cpu访问前调用，指定待刷新内存的物理地址及其长度
+      当paddr是buffer的起始地址，且length是整块buffer的大小，执行full sync
+      其它情况则执行partial sync
+      partial sync要求地址偏移和length是64bytes对齐
     成功  返回0
     失败  返回负值
  */
-RK_S32 RK_MPI_MMZ_FlushCachePaddrStart(RK_U64 vaddr, RK_U32 length, RK_U32 flags);
+RK_S32 RK_MPI_MMZ_FlushCachePaddrStart(RK_U64 paddr, RK_U32 length, RK_U32 flags);
 
 /*
-    flush cache, 在cpu访问结束后调用
-      指定待刷新内存的物理地址及其长度，只支持partial sync
+    flush cache, 在cpu访问前调用，指定待刷新内存的物理地址及其长度
+      当paddr是buffer的起始地址，且length是整块buffer的大小，执行full sync
+      其它情况则执行partial sync
+      partial sync要求地址偏移和length是64bytes对齐
     成功  返回0
     失败  返回负值
  */
-RK_S32 RK_MPI_MMZ_FlushCachePaddrEnd(RK_U64 vaddr, RK_U32 length, RK_U32 flags);
+RK_S32 RK_MPI_MMZ_FlushCachePaddrEnd(RK_U64 paddr, RK_U32 length, RK_U32 flags);
 
 /*
     把用户的内存加入到MMZ进行管理

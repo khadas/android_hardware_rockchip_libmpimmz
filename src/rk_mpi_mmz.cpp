@@ -287,7 +287,7 @@ static RK_S32 RK_MPI_MMZ_FlushCache(MB_BLK mb, RK_U32 offset, RK_U32 length, RK_
     else
         dma_flags |= DMA_BUF_SYNC_READ|DMA_BUF_SYNC_WRITE;
 
-    if (offset==0 && length==0) { // full sync
+    if (offset==0 && (length==0 || length==pBI->len)) { // full sync
         ret = dmabuf_sync(pBI->fd, dma_flags);
     } else {
         ret = dmabuf_sync_partial(pBI->fd, offset, length, dma_flags);
