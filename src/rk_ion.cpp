@@ -113,7 +113,7 @@ int ion_get_phys(int fd, uint64_t *paddr)
     return 0;
 }
 
-int ion_alloc(uint32_t len, bool is_cma, bool is_cacheable, int *fd)
+int ion_alloc(uint32_t len, bool is_cma, bool is_cacheable, bool is_dma32, int *fd)
 {
     // ion alloc
     struct ion_allocation_data data = {
@@ -135,6 +135,9 @@ int ion_alloc(uint32_t len, bool is_cma, bool is_cacheable, int *fd)
         data.flags = ION_FLAG_CACHED;
     else
         data.flags = 0;
+
+    if (is_dma32)
+        data.flags |= ION_FLAG_DMA32;
 
     int ret = ion_ioctl(ION_IOC_ALLOC, &data);
     if (ret < 0) {

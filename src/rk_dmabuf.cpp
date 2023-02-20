@@ -54,7 +54,7 @@ void* dmabuf_mmap(int fd, off_t offset, size_t len)
     return (vaddr==MAP_FAILED) ? NULL : vaddr;
 }
 
-int dmabuf_alloc(uint32_t len, bool is_cma, bool is_cacheable, int *fd)
+int dmabuf_alloc(uint32_t len, bool is_cma, bool is_cacheable, bool is_dma32, int *fd)
 {
     int ret = -1;
 #ifdef SUPPORT_DMABUF_ALLOCATOR
@@ -65,12 +65,16 @@ int dmabuf_alloc(uint32_t len, bool is_cma, bool is_cacheable, int *fd)
     if (is_cma) {
         ret = s_dmabuf_allocator->Alloc(is_cacheable?kDmabufCmaHeapName:kDmabufCmaUncachedHeapName, len);
     } else {
-        ret = s_dmabuf_allocator->Alloc(is_cacheable?kDmabufSystemHeapName:kDmabufSystemUncachedHeapName, len);
+        if (is_dma32)
+            ret = s_dmabuf_allocator->Alloc(is_cacheable?kDmabufSystemDma32HeapName:kDmabufSystemUncachedDma32HeapName, len);
+        else
+            ret = s_dmabuf_allocator->Alloc(is_cacheable?kDmabufSystemHeapName:kDmabufSystemUncachedHeapName, len);
     }
 #else
     (void)len;
     (void)is_cma;
     (void)is_cacheable;
+    (void)is_dma32;
 #endif
 
     if (ret < 0)

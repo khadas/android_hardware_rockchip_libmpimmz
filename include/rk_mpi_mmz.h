@@ -41,11 +41,17 @@ typedef struct _rkMB_EXT_CONFIG_S {
     RK_VOID            *reserve2;
 } MB_EXT_CONFIG_S;
 
+// 分配物理不连续的内存
 #define RK_MMZ_ALLOC_TYPE_IOMMU     0x00000000
+// 分配物理连续的内存
 #define RK_MMZ_ALLOC_TYPE_CMA       0x00000001
 
+// 分配的内存支持cache
 #define RK_MMZ_ALLOC_CACHEABLE      0x00000000
+// 分配的内存不支持cache
 #define RK_MMZ_ALLOC_UNCACHEABLE    0x00000010
+// 分配的内存地址需要在4G以内
+#define RK_MMZ_ALLOC_DMA32          0x00000020
 
 #define RK_MMZ_SYNC_READONLY        0x00000000
 #define RK_MMZ_SYNC_WRITEONLY       0x00000001

@@ -9,11 +9,12 @@ extern "C" {
     申请ion内存
     is_cma 是否申请CMA heap内存，若为false则申请SYSTEM heap内存
     is_cacheable 申请的内存是否支持cache
+    is_dma32 申请的内存是否限制地址在4G以内
     fd 存放返回的ion内存的dmabuf fd
     成功 返回0
     失败 返回负值
  */
-int ion_alloc(uint32_t len, bool is_cma, bool is_cacheable, int *fd);
+int ion_alloc(uint32_t len, bool is_cma, bool is_cacheable, bool is_dma32, int *fd);
 
 /*
     获取ion内存的物理地址

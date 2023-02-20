@@ -30,6 +30,8 @@
 
 static const char kDmabufSystemHeapName[] = "system";
 static const char kDmabufSystemUncachedHeapName[] = "system-uncached";
+static const char kDmabufSystemDma32HeapName[] = "system-dma32";
+static const char kDmabufSystemUncachedDma32HeapName[] = "system-uncached-dma32";
 static const char kDmabufCmaHeapName[] = "cma";
 static const char kDmabufCmaUncachedHeapName[] = "cma-uncached";
 

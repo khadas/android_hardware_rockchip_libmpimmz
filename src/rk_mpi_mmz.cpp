@@ -87,15 +87,16 @@ RK_S32 RK_MPI_MMZ_Alloc(MB_BLK *pBlk, RK_U32 u32Len, RK_U32 u32Flags)
 
     bool is_cma = !!(u32Flags & RK_MMZ_ALLOC_TYPE_CMA);
     bool is_cacheable = !(u32Flags & RK_MMZ_ALLOC_UNCACHEABLE);
+    bool is_dma32 = !!(u32Flags & RK_MMZ_ALLOC_DMA32);
 
     // alloc
     int fd = -1;
     if (ion_check_support()) {
-        if (ion_alloc(u32Len, is_cma, is_cacheable, &fd) < 0) {
+        if (ion_alloc(u32Len, is_cma, is_cacheable, is_dma32, &fd) < 0) {
             return -1;
         }
     } else {
-        if (dmabuf_alloc(u32Len, is_cma, is_cacheable, &fd) < 0) {
+        if (dmabuf_alloc(u32Len, is_cma, is_cacheable, is_dma32, &fd) < 0) {
             return -1;
         }
     }
