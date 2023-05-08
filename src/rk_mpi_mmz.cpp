@@ -201,7 +201,7 @@ MB_BLK RK_MPI_MMZ_Fd2Handle(RK_S32 fd)
 
     // 查表
     std::lock_guard<std::mutex> lck (mb_list_mutex);
-    for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); iter++)
+    for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); ++iter)
     {
         struct BufferInfo *pBI = (struct BufferInfo *)*iter;
         if (pBI->fd == fd)
@@ -217,7 +217,7 @@ MB_BLK RK_MPI_MMZ_VirAddr2Handle(RK_VOID *pstVirAddr)
         return (MB_BLK)NULL;
 
     std::lock_guard<std::mutex> lck (mb_list_mutex);
-    for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); iter++)
+    for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); ++iter)
     {
         struct BufferInfo *pBI = (struct BufferInfo *)*iter;
         if (pstVirAddr >= pBI->vaddr && pstVirAddr < (void*)((uint8_t*)(pBI->vaddr)+pBI->len)) {
@@ -234,7 +234,7 @@ MB_BLK RK_MPI_MMZ_PhyAddr2Handle(RK_U64 paddr)
         return (MB_BLK)NULL;
 
     std::lock_guard<std::mutex> lck (mb_list_mutex);
-    for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); iter++)
+    for (MB_LIST::iterator iter = mb_list.begin(); iter != mb_list.end(); ++iter)
     {
         struct BufferInfo *pBI = (struct BufferInfo *)*iter;
         if (paddr >= pBI->paddr && paddr < (pBI->paddr+pBI->len)) {

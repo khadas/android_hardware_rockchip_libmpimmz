@@ -65,7 +65,7 @@ int BufferAllocator::OpenDmabufHeap(const std::string& heap_name) {
 
     ALOGI("Using DMA-BUF heap named: %s", heap_name.c_str());
 
-    auto ret = dmabuf_heap_fds_.insert({heap_name, fd});
+    dmabuf_heap_fds_.insert({heap_name, fd});
     return fd;
 }
 

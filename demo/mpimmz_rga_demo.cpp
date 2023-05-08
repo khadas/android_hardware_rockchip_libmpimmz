@@ -79,7 +79,6 @@ int cpu_copy(MB_BLK mb_dst, MB_BLK mb_src, int len)
 
 int main(int argc, const char** argv)
 {
-    int ret;
     int len = 3133440;//width*height*3/2;//
     int flags = RK_MMZ_ALLOC_TYPE_IOMMU | RK_MMZ_ALLOC_CACHEABLE;
     int test_rga = 0;
@@ -126,6 +125,7 @@ int main(int argc, const char** argv)
         MB_BLK mb_src, mb_dst;
         void* vaddr_src;
         void* vaddr_dst;
+        int ret;
 
         // 分配内存
         ret = RK_MPI_MMZ_Alloc(&mb_src, len, flags);

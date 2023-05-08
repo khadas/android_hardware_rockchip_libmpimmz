@@ -87,7 +87,8 @@ static uint32_t ion_get_heap_id_mask(uint32_t heap_type)
     }
 
     for (const auto& heap : ion_heaps) {
-        if (heap.type == heap_type)
+        uint32_t type = heap.type;
+        if (type == heap_type)
             return 1<<heap.heap_id;
     }
 

@@ -46,7 +46,7 @@ class IDemo : public IInterface {
 // Client
 class BpDemo : public BpInterface<IDemo> {
     public:
-        BpDemo(const sp<IBinder>& impl) : BpInterface<IDemo>(impl) {
+        explicit BpDemo(const sp<IBinder>& impl) : BpInterface<IDemo>(impl) {
             printf("BpDemo::BpDemo()\n");
         }
 
@@ -58,7 +58,7 @@ class BpDemo : public BpInterface<IDemo> {
 
             remote()->transact(SET_BUFFER, data, &reply);
 
-            printf("BpDemo::setBuffer(fd=%d, len=%d)\n", fd, len);
+            printf("BpDemo::setBuffer(fd=%d, len=%u)\n", fd, len);
         }
 
         virtual void getBuffer(int32_t* fd, uint32_t* len) {
@@ -71,7 +71,7 @@ class BpDemo : public BpInterface<IDemo> {
             *fd = dup(reply.readFileDescriptor());
             *len = reply.readUint32();
 
-            printf("BpDemo::getBuffer(fd=%d, len=%d)\n", *fd, *len);
+            printf("BpDemo::getBuffer(fd=%d, len=%u)\n", *fd, *len);
         }
 
         virtual void freeBuffer() {
@@ -131,7 +131,7 @@ int check_data(uint8_t *data, uint8_t value, uint32_t len)
 {
     for(uint32_t i=0; i<len; i++) {
         if (data[i] != value) {
-            printf("unmatch in data[%d]=0x%x\n", i, data[i]);
+            printf("unmatch in data[%u]=0x%x\n", i, data[i]);
             return -1;
         }
     }
@@ -143,7 +143,7 @@ class Server : public BnDemo {
     MB_BLK m_blk = NULL;
 
     virtual void setBuffer(int32_t fd, uint32_t len) {
-        printf("Server::setBuffer(%d, %d)\n", fd, len);
+        printf("Server::setBuffer(%d, %u)\n", fd, len);
         m_blk = RK_MPI_MMZ_ImportFD(fd, len);
         void* vaddr = RK_MPI_MMZ_Handle2VirAddr(m_blk);
 
@@ -168,7 +168,7 @@ class Server : public BnDemo {
         printf("Fill 0x5A\n");
         memset(vaddr, 0x5A, *len);
 
-        printf("Server::getBuffer(%d, %d)\n", *fd, *len);
+        printf("Server::getBuffer(%d, %u)\n", *fd, *len);
     }
 
     virtual void freeBuffer() {
@@ -185,9 +185,9 @@ sp<IDemo> getDemoServ() {
     sp<IBinder> binder = sm->getService(String16(BINDER_SERV_NAME));
     // TODO: If the "Demo" service is not running, getService times out and binder == 0.
     ASSERT(binder != 0);
-    sp<IDemo> demo = interface_cast<IDemo>(binder);
-    ASSERT(demo != 0);
-    return demo;
+    sp<IDemo> ret = interface_cast<IDemo>(binder);
+    ASSERT(ret != 0);
+    return ret;
 }
 
 void startDemoServ()

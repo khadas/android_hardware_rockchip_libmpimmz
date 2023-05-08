@@ -42,7 +42,6 @@ static inline int time_diff_ms(struct timespec* before, struct timespec* after)
 int main(int argc, const char** argv)
 {
     int len = 128*1024;
-    int ret;
     MB_BLK mb;
     int flags = RK_MMZ_ALLOC_TYPE_IOMMU | RK_MMZ_ALLOC_CACHEABLE;
     printf("Usage: %s [--cma] [--uncache] len\n", argv[0]);
@@ -57,7 +56,7 @@ int main(int argc, const char** argv)
     }
 
     while(1) {
-        ret = RK_MPI_MMZ_Alloc(&mb, len, flags);
+        int ret = RK_MPI_MMZ_Alloc(&mb, len, flags);
         if (ret < 0) {
             return ret;
         }
@@ -95,30 +94,30 @@ int main(int argc, const char** argv)
         uint32_t offset;
         vaddr_temp = (char*)vaddr + len - 10;
         vaddr_to_fd_offset(vaddr_temp, fd, offset);
-        printf("vaddr+len-10: %p, fd: %d, offset: %d\n", vaddr_temp, fd, offset);
+        printf("vaddr+len-10: %p, fd: %d, offset: %u\n", vaddr_temp, fd, offset);
 
         paddr_temp = paddr+len-10;
         paddr_to_fd_offset(paddr_temp, fd, offset);
         printf("paddr+len-10: 0x%"PRIx64", fd: %d, offset: %d\n", paddr_temp, fd, offset);
 
-        ret = RK_MPI_MMZ_FlushCacheStart(mb, 0, 0, RK_MMZ_SYNC_WRITEONLY);
+        RK_MPI_MMZ_FlushCacheStart(mb, 0, 0, RK_MMZ_SYNC_WRITEONLY);
         memset(vaddr, 0x5A, len);
-        ret = RK_MPI_MMZ_FlushCacheEnd(mb, 0, 0, RK_MMZ_SYNC_WRITEONLY);
+        RK_MPI_MMZ_FlushCacheEnd(mb, 0, 0, RK_MMZ_SYNC_WRITEONLY);
 
-        ret = RK_MPI_MMZ_FlushCacheStart(mb, 4096, 4096, RK_MMZ_SYNC_RW);
+        RK_MPI_MMZ_FlushCacheStart(mb, 4096, 4096, RK_MMZ_SYNC_RW);
         memset(vaddr, 0x5A, len);
-        ret = RK_MPI_MMZ_FlushCacheEnd(mb, 4096, 4096, RK_MMZ_SYNC_RW);
+        RK_MPI_MMZ_FlushCacheEnd(mb, 4096, 4096, RK_MMZ_SYNC_RW);
 
         vaddr_temp = (char*)vaddr + len - 10;
-        ret = RK_MPI_MMZ_FlushCacheVaddrStart(vaddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
+        RK_MPI_MMZ_FlushCacheVaddrStart(vaddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
         memset(vaddr_temp, 0x5A, 10);
-        ret = RK_MPI_MMZ_FlushCacheVaddrEnd(vaddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
+        RK_MPI_MMZ_FlushCacheVaddrEnd(vaddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
 
         paddr_temp = paddr_temp+len-10;
-        ret = RK_MPI_MMZ_FlushCachePaddrStart(paddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
+        RK_MPI_MMZ_FlushCachePaddrStart(paddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
         vaddr_temp = (char*)vaddr + len - 10;
         memset(vaddr_temp, 0x5A, 10);
-        ret = RK_MPI_MMZ_FlushCachePaddrEnd(paddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
+        RK_MPI_MMZ_FlushCachePaddrEnd(paddr_temp, 4096, RK_MMZ_SYNC_WRITEONLY);
 
         usleep(100000);
         RK_MPI_MMZ_Free(mb);
